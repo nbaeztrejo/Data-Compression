@@ -60,8 +60,6 @@ def main():
 
     file = open(input_name, "rb")
 
-    hi = 0
-
     try:
 
         bit = file.read(1)
@@ -75,10 +73,7 @@ def main():
             look_ahead += bit
             bit = file.read(1)
 
-            hi+=1
-            
-
-
+        #fill search buffer and output initial characters
         while (len(search) < lenN):
 
             if (bit == ''):
@@ -91,22 +86,16 @@ def main():
 
             next_out = zerozero + charbit
             output += bytes(next_out)
-            #next_out = '{0,0,' + look_ahead[0] + '}'
-            #print next_out
-            #output += next_out
             search += look_ahead[0]
             look_ahead = look_ahead[1:] + bit
             bit = file.read(1)
-
-            hi+=1
         
-        #print search, look_ahead
-
+        #perform algorithm on rest of file
         while (bit != '' or look_ahead != ''):
 
-            #print LZ77_search(search, look_ahead)
             offset, length, char = LZ77_search(search, look_ahead)
 
+            #shift window
             shift = length + 1
             search += look_ahead[:shift]
             search = search[shift:]
@@ -124,9 +113,8 @@ def main():
                 look_ahead += bit
                 bit = file.read(1)
                 shift -= 1
-                hi +=1
 
-            
+            #convert to bits
             charbit = format(ord(char), 'b')
             while (8 - len(charbit) > 0):
                 charbit = '0' + charbit
@@ -141,11 +129,6 @@ def main():
 
             next_out = offbit + lenbit + charbit
             output += bytes(next_out)
-
-            #next_out = '{' + str(offset) + ',' + str(length) + ',' + char + '}'
-            #output += next_out
-
-
 
     finally:
         file.close()
